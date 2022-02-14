@@ -1,0 +1,22 @@
+#!/bin/ash
+set -e
+
+readonly PID_FILE="/run/postfwd/postfwd.pid"
+readonly CONF_FILE="/etc/postfwd/postfwd.conf"
+
+[[ -e "$PID_FILE" ]] && rm -v "$PID_FILE"
+
+exec /usr/sbin/postfwd3 \
+  --file "$CONF_FILE" \
+  --interface 0.0.0.0 \
+  --port "$APP_PORT" \
+  --user "$APP_USER" \
+  --group "$APP_GROUP" \
+  --pidfile "$PID_FILE" \
+  --cache 600 \
+  --cache-rdomain-only \
+  --cache-no-size \
+  --nodaemon
+
+# vim: set ft=bash ts=2 sts=2 expandtab:
+
