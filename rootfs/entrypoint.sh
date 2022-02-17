@@ -10,11 +10,11 @@ set -o errexit -o pipefail
 : "${APP_USER:=postfwd}"
 : "${APP_GROUP:=postfwd}"
 : "${APP_HOME:=/run/postfwd}"
-: "${APP_CONF_DIR:=/etc/postfwd}"
+: "${APP_CONF_FILE:=/etc/postfwd/postfwd.conf}"
 : "${APP_PORT:=10045}"
 
 # export configuration
-export APP_UID APP_GID APP_UMASK APP_USER APP_GROUP APP_HOME APP_PORT
+export APP_CONF_FILE APP_PORT APP_USER APP_GROUP
 
 # invoked as root, add user and prepare container
 if [ "$(id -u)" -eq 0 ]; then
@@ -26,10 +26,13 @@ if [ "$(id -u)" -eq 0 ]; then
   addgroup -g "$APP_GID" "$APP_GROUP"
   adduser -HD -h "$APP_HOME" -s /sbin/nologin -G "$APP_GROUP" -u "$APP_UID" -k /dev/null "$APP_USER"
 
-  echo ">> fixing owner of $APP_CONF_DIR"
+  echo ">> fixing permissions"
   install -dm 0750 -o "$APP_USER" -g "$APP_GROUP" "$APP_HOME"
-  install -dm 0750 -o "$APP_USER" -g "$APP_GROUP" "$APP_CONF_DIR"
-  chown -R "$APP_USER":"$APP_GROUP" "$APP_CONF_DIR" "$APP_HOME" /etc/s6
+  if [[ ! -e "$APP_CONF_FILE" ]]; then touch "$APP_CONF_FILE"; fi
+  chown -R "$APP_USER":"$APP_GROUP" \
+          "$APP_CONF_FILE" \
+          "$APP_HOME" \
+          /etc/s6
 
   echo ">> create link for syslog redirection"
   install -dm 0750 -o "$APP_USER" -g "$APP_GROUP" /run/syslogd

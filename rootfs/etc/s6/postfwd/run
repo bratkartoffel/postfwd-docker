@@ -2,13 +2,12 @@
 set -e
 
 readonly PID_FILE="/run/postfwd/postfwd.pid"
-readonly CONF_FILE="/etc/postfwd/postfwd.conf"
 
 [[ -e "$PID_FILE" ]] && rm -v "$PID_FILE"
 
 exec /usr/sbin/postfwd3 \
-  --file "$CONF_FILE" \
   --interface 0.0.0.0 \
+  --file "$APP_CONF_FILE" \
   --port "$APP_PORT" \
   --user "$APP_USER" \
   --group "$APP_GROUP" \
