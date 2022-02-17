@@ -9,5 +9,8 @@ RUN apk upgrade --no-cache \
 # add the custom configurations
 COPY rootfs/ /
 
+# default postfwd port
+EXPOSE 10045/tcp
+
 CMD [ "/entrypoint.sh" ]
 
